@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.4.32804.182
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CSV2XLSX", "CSV2XLSX\CSV2XLSX.csproj", "{512D1048-2435-4C73-B18D-21BD0F52E5E8}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{512D1048-2435-4C73-B18D-21BD0F52E5E8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{512D1048-2435-4C73-B18D-21BD0F52E5E8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{512D1048-2435-4C73-B18D-21BD0F52E5E8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{512D1048-2435-4C73-B18D-21BD0F52E5E8}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {FF5E3E4A-7A5B-478B-992C-4F4A0131C41F}
+	EndGlobalSection
+EndGlobal
