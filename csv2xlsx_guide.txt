@@ -1,9 +1,9 @@
 Консольное приложение для преобразования .csv файлов в .xlsx и сопутствующей обработки.
-Вызов осуществляется посредством выполнения команды csv2xlsx.exe --csv-files "C:\Users\ryabuhin_ia\repos\flapdoodle\before_edit.csv"
+Вызов осуществляется посредством выполнения команды csv2xlsx.exe --in-path "C:\SomeDir\SomeSubDir" --all
 Указание исходного(-ых) .csv файла(-ов) ОБЯЗАТЕЛЬНО.
 
 Возможные аргументы и их приортеты (с примерами):
-(obligatory) --in-path "C:\SomeDir\SomeSubDir"
+(obligatory) --in-path "C:\SomeDir\SomeSubDir", папка с файлом(-ами), требуется указать абсолютный путь
 (obligatory) --filename "abc.csv" --filename "xyz.csv" (or) --all, требуется либо указать названия файлов, указав параметр --filename перед каждым названием, либо указать параметр --all
 (optional) --out-path "C:\SomeDir", по умолчанию приравнивается к --in-path
 (optional) --data-rows-offset 2, определяет верхнюю границу диапазона ячеек на графике (с какой строки начать строить график), по умолчанию первая строка после хэдера
@@ -11,5 +11,5 @@
 (optional) --data-fields-amount 4, определяет количество столбцов, задействованных в построении графика, по умолчанию все столбцы после --y-axis-field-name
 (optional) --y-axis-field-name "somename", определяет название столбца, используемого как ось Y на графике, по умолчанию использует "ms"
 (optional) --delimiter-string ";", определяет разделительный символ в .csv файле, по умолчанию использует ";"
-(optional) --worksheet-name "SomeWsName", определяет название листа с таблицей в файле Excel, по умолчанию использует "CSV2XLSX"
+(optional) --worksheet-name "SomeWsName", определяет название листа с таблицей в файле Excel, по умолчанию использует "Worksheet 1"
 (optional) --chart-title "SomeTitleName", определяет название графика в файле Excel, по умолчанию использует "Parameters chart"

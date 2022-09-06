@@ -24,8 +24,7 @@ namespace CSV2XLSX
         /// <param name="delimiterString">Delimiter string for .csv file</param>
         /// <param name="worksheetName">Worksheet name in .xlsx file</param>
         /// <param name="chartTitle">Chart title</param>
-        [STAThread]
-        private static void Main(
+        static void Main(
             string? inPath = null,
             string[]? filename = null,
             bool all = false,
