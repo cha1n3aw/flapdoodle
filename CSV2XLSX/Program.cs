@@ -5,6 +5,9 @@ using System.Globalization;
 using OfficeOpenXml.Drawing.Chart;
 using System.CommandLine;
 using System.CommandLine.DragonFruit;
+using DocumentFormat.OpenXml.Spreadsheet;
+using DocumentFormat.OpenXml.Office2016.Drawing.ChartDrawing;
+using OfficeOpenXml.Drawing.Chart.Style;
 
 namespace CSV2XLSX
 {
@@ -161,18 +164,17 @@ namespace CSV2XLSX
                         }
                         if (!dc)
                         {
-                            ExcelChart chart1 = worksheet.Drawings.AddChart("Engine parameters", eChartType.XYScatterLinesNoMarkers);
-                            chart1.Title.Text = ct;
-                            chart1.SetPosition(1, 0, yAxisFieldColumn + fa + 1, 0);
-                            chart1.SetSize(cw, ch);
-                            chart1.XAxis.MaxValue = Convert.ToDouble(worksheet.Cells[csvRows.Count, yAxisFieldColumn].Value);
-                            ExcelChartSerie serie1 = chart1.Series.Add(worksheet.Cells[ro + 1, yAxisFieldColumn + 1 + fo, csvRows.Count, yAxisFieldColumn + fo + 1], worksheet.Cells[ro + 1, yAxisFieldColumn, csvRows.Count, yAxisFieldColumn]);
-                            serie1.Header = worksheet.Cells[ro, yAxisFieldColumn + fo + 1].Value.ToString();
+                            ExcelChart chart = worksheet.Drawings.AddChart(ct, eChartType.Line);
+                            chart.Legend.Position = eLegendPosition.Bottom;
+                            chart.Title.Text = ct;
+                            chart.SetPosition(1, 0, yAxisFieldColumn + fa + 1, 0);
+                            chart.SetSize(cw, ch);
+                            chart.XAxis.MaxValue = Convert.ToDouble(worksheet.Cells[csvRows.Count, yAxisFieldColumn].Value);
+                            chart.XAxis.MinValue = Convert.ToDouble(worksheet.Cells[ro + 1, yAxisFieldColumn].Value);
                             for (int y = yAxisFieldColumn + fo + 2; y <= yAxisFieldColumn + fa; y++)
                             {
-                                ExcelChart chart2 = chart1.PlotArea.ChartTypes.Add(eChartType.XYScatterLinesNoMarkers);
-                                ExcelChartSerie serie2 = chart2.Series.Add(worksheet.Cells[ro + 1, y, csvRows.Count, y], worksheet.Cells[ro + 1, yAxisFieldColumn, csvRows.Count, yAxisFieldColumn]);
-                                serie2.Header = worksheet.Cells[ro, y].Value.ToString();
+                                ExcelChartSerie serie = chart.PlotArea.ChartTypes.Add(eChartType.Line).Series.Add(worksheet.Cells[ro + 1, y, csvRows.Count, y], worksheet.Cells[ro + 1, yAxisFieldColumn, csvRows.Count, yAxisFieldColumn]);
+                                serie.Header = worksheet.Cells[ro, y].Value.ToString();  
                             }
                         }
                         if (aw) worksheet.Cells[worksheet.Dimension.Address].AutoFitColumns();
