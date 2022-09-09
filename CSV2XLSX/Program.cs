@@ -16,8 +16,8 @@ namespace CSV2XLSX
         /// <param name="i">Input directory (obligatory)</param>
         /// <param name="f">Filenames array (obligatory, or specify -a)</param>
         /// <param name="a">Select all files in an input directory (obligatory, or specify -f)</param>
-        /// <param name="c">Enable chart creation (optional)</param>
         /// <param name="o">Output directory (optional)</param>
+        /// <param name="dc">Disable chart creation (optional)</param>
         /// <param name="aw">Enable column auto-width (optional)</param>
         /// <param name="ro">Rows of data offset (optional)</param>
         /// <param name="fo">Columns of data offset (optional)</param>
@@ -32,8 +32,8 @@ namespace CSV2XLSX
             string? i = null,
             string[]? f = null,
             bool a = false,
-            bool c = false,
             string? o = null,
+            bool dc = false,
             bool aw = false,
             int ro = 0,
             int fo = 0,
@@ -159,7 +159,7 @@ namespace CSV2XLSX
                                 }
                             }
                         }
-                        if (c)
+                        if (!dc)
                         {
                             ExcelChart chart1 = worksheet.Drawings.AddChart("Engine parameters", eChartType.XYScatterLinesNoMarkers);
                             chart1.Title.Text = ct;
