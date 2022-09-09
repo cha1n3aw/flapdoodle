@@ -13,99 +13,107 @@ namespace CSV2XLSX
         /// <summary>
         /// A simple .csv to .xlsx parser with some chart magic
         /// </summary>
-        /// <param name="inPath">Input directory</param>
-        /// <param name="filename">Filenames array</param>
-        /// <param name="all">Select all files in an input directory</param>
-        /// <param name="outPath">Output directory</param>
-        /// <param name="dataRowsOffset">Rows of data offset</param>
-        /// <param name="dataFieldsOffset">Columns of data offset</param>
-        /// <param name="dataFieldsAmount">Amount of data columns</param>
-        /// <param name="yAxisFieldName">Column name for chart Y-axis</param>
-        /// <param name="delimiterString">Delimiter string for .csv file</param>
-        /// <param name="worksheetName">Worksheet name in .xlsx file</param>
-        /// <param name="chartTitle">Chart title</param>
+        /// <param name="i">Input directory (obligatory)</param>
+        /// <param name="f">Filenames array (obligatory, or specify -a)</param>
+        /// <param name="a">Select all files in an input directory (obligatory, or specify -f)</param>
+        /// <param name="c">Enable chart creation (optional)</param>
+        /// <param name="o">Output directory (optional)</param>
+        /// <param name="aw">Enable column auto-width (optional)</param>
+        /// <param name="ro">Rows of data offset (optional)</param>
+        /// <param name="fo">Columns of data offset (optional)</param>
+        /// <param name="fa">Amount of data columns (optional)</param>
+        /// <param name="fn">Column name for chart Y-axis (optional)</param>
+        /// <param name="ds">Delimiter string for .csv file (optional)</param>
+        /// <param name="wn">Worksheet name in .xlsx file (optional)</param>
+        /// <param name="ct">Custom chart title (optional)</param>
+        /// <param name="ch">Custom chart height (optional)</param>
+        /// <param name="cw">Custom chart width (optional)</param>
         static void Main(
-            string? inPath = null,
-            string[]? filename = null,
-            bool all = false,
-            string? outPath = null,
-            int dataRowsOffset = 0,
-            int dataFieldsOffset = 0,
-            int dataFieldsAmount = 0,
-            string yAxisFieldName = "ms",
-            string delimiterString = ";",
-            string worksheetName = "Worksheet 1",
-            string chartTitle = "Parameters chart")
+            string? i = null,
+            string[]? f = null,
+            bool a = false,
+            bool c = false,
+            string? o = null,
+            bool aw = false,
+            int ro = 0,
+            int fo = 0,
+            int fa = 0,
+            string fn = "ms",
+            string ds = ";",
+            string wn = "Worksheet 1",
+            string ct = "Parameters chart",
+            int ch = 500,
+            int cw = 1000)
         {
             try
             {
-                if (inPath == null || inPath.Length == 0)
+                if (i == null || i.Length == 0)
                 {
-                    Console.WriteLine("Error: no --in-path specified");
+                    Console.WriteLine("Error: no -i specified");
                     return;
                 }
-                else if (!Path.Exists(inPath))
+                else if (!Path.Exists(i))
                 {
-                    Console.WriteLine($"Error: --in-path '{inPath}' doesn't exist");
+                    Console.WriteLine($"Error: -i '{i}' doesn't exist");
                     return;
                 }
-                if (!all)
+                if (!a)
                 {
-                    if (filename == null || filename.Length == 0)
+                    if (f == null || f.Length == 0)
                     {
-                        Console.WriteLine("Error: no --filename specified");
+                        Console.WriteLine("Error: no -f specified");
                         return;
                     }
                     else 
-                        foreach (string name in filename)
+                        foreach (string name in f)
                         if (!name.Contains(".csv"))
                         {
-                            Console.WriteLine($"Error: --filename '{name}' has wrong extension");
+                            Console.WriteLine($"Error: -f '{name}' has wrong extension");
                             return;
                         }
-                        else if (!File.Exists(Path.Combine(inPath, name)))
+                        else if (!File.Exists(Path.Combine(i, name)))
                         {
-                            Console.WriteLine($"Error: --filename '{name}' doesn't exist");
+                            Console.WriteLine($"Error: -f '{name}' doesn't exist");
                             return;
                         }
                 }
                 else
                 {
-                    filename = Directory.GetFiles(inPath, "*.csv");
-                    for (int i = 0; i < filename.Length; i++) filename[i] = Path.GetFileName(filename[i]);
+                    f = Directory.GetFiles(i, "*.csv");
+                    for (int y = 0; y < f.Length; y++) f[y] = Path.GetFileName(f[y]);
                 }
-                if (outPath == null || outPath == string.Empty) outPath = inPath;
-                else if (!Path.Exists(outPath))
+                if (o == null || o == string.Empty) o = i;
+                else if (!Path.Exists(o))
                 {
-                    Console.WriteLine($"Error: --out-path '{outPath}' doesn't exist");
+                    Console.WriteLine($"Error: -o '{o}' doesn't exist");
                     return;
                 }
-                dataRowsOffset++;
-                foreach (string csvFile in filename)
+                ro++;
+                int yAxisFieldColumn = 0;
+                foreach (string csvFile in f)
                 {
                     string csvFilePath = String.Empty;
                     string xlsxFilePath = String.Empty;
                     List<string[]> csvRows = new();
-                    int yAxisFieldColumn = 0;
                     try
                     {
-                        csvFilePath = Path.Combine(inPath, csvFile);
-                        xlsxFilePath = Path.Combine(outPath, csvFile.Replace(".csv", ".xlsx"));
+                        csvFilePath = Path.Combine(i, csvFile);
+                        xlsxFilePath = Path.Combine(o, csvFile.Replace(".csv", ".xlsx"));
                         using (TextFieldParser parser = new(csvFilePath))
                         {
                             parser.TextFieldType = FieldType.Delimited;
-                            parser.SetDelimiters(delimiterString);
+                            parser.SetDelimiters(ds);
                             int headerRow = 0;
                             while (!parser.EndOfData)
                             {
                                 string[]? fields = parser.ReadFields();
                                 if (fields != null && fields.Length > 0)
                                 {
-                                    if (headerRow == 0 && fields.Contains(yAxisFieldName))
+                                    if (headerRow == 0 && fields.Contains(fn))
                                     {
-                                        if (yAxisFieldColumn == 0 && yAxisFieldName != null && yAxisFieldName != string.Empty) yAxisFieldColumn = fields.ToList().IndexOf(yAxisFieldName) + 1;
+                                        if (fn != null && fn != string.Empty) yAxisFieldColumn = fields.ToList().IndexOf(fn) + 1;
                                         headerRow = csvRows.Count;
-                                        if (dataFieldsAmount == 0) dataFieldsAmount = fields.Length - yAxisFieldColumn;
+                                        fa = fields.Length - yAxisFieldColumn;
                                     }
                                     csvRows.Add(fields);
                                 }
@@ -122,48 +130,53 @@ namespace CSV2XLSX
                         if (File.Exists(xlsxFilePath)) File.Delete(xlsxFilePath);
                         FileInfo workbookFileInfo = new(xlsxFilePath);
                         using ExcelPackage excelPackage = new(workbookFileInfo);
-                        ExcelWorksheet worksheet = excelPackage.Workbook.Worksheets.Add(worksheetName);
+                        ExcelWorksheet worksheet = excelPackage.Workbook.Worksheets.Add(wn);
 
-                        for (int i = 0; i < csvRows.Count; i++)
+                        for (int z = 0; z < csvRows.Count; z++)
                         {
-                            for (int y = 0; y < csvRows[i].Length; y++)
+                            for (int y = 0; y < csvRows[z].Length; y++)
                             {
-                                csvRows[i][y] = Regex.Replace(csvRows[i][y], @"[^\u0000-\u007F]+", string.Empty);                       //delete all non-utf8 chars
-                                if (i == 0) worksheet.Cells[i + 1, y + 1].Value = csvRows[i][y];
+                                csvRows[z][y] = Regex.Replace(csvRows[z][y], @"[^\u0000-\u007F]+", string.Empty);                       //delete all non-utf8 chars
+                                if (z == 0) worksheet.Cells[z + 1, y + 1].Value = csvRows[z][y];
                                 else
                                 {
-                                    if (Regex.IsMatch(csvRows[i][y], "^[\\+\\-]{0,1}\\d+[\\.\\,]\\d+$"))                                //double
-                                        worksheet.Cells[i + 1, y + 1].Value = Double.Parse(csvRows[i][y], CultureInfo.InvariantCulture);
-                                    else if (Regex.IsMatch(csvRows[i][y], "^[\\+\\-]{0,1}\\d+$"))                                       //int
-                                        worksheet.Cells[i + 1, y + 1].Value = Int32.Parse(csvRows[i][y]);
-                                    else if (Regex.IsMatch(csvRows[i][y], "^(?:(?:31(\\/|-|\\.)(?:0?[13578]|1[02]))\\1|(?:(?:29|30)(\\/|-|\\.)(?:0?[13-9]|1[0-2])\\2))(?:(?:1[6-9]|[2-9]\\d)?\\d{2})$|^(?:29(\\/|-|\\.)0?2\\3(?:(?:(?:1[6-9]|[2-9]\\d)?(?:0[48]|[2468][048]|[13579][26])|(?:(?:16|[2468][048]|[3579][26])00))))$|^(?:0?[1-9]|1\\d|2[0-8])(\\/|-|\\.)(?:(?:0?[1-9])|(?:1[0-2]))\\4(?:(?:1[6-9]|[2-9]\\d)?\\d{2})$"))                                            //date
+                                    if (Regex.IsMatch(csvRows[z][y], "^[\\+\\-]{0,1}\\d+[\\.\\,]\\d+$"))                                //double
+                                        worksheet.Cells[z + 1, y + 1].Value = Double.Parse(csvRows[z][y], CultureInfo.InvariantCulture);
+                                    else if (Regex.IsMatch(csvRows[z][y], "^[\\+\\-]{0,1}\\d+$"))                                       //int
+                                        worksheet.Cells[z + 1, y + 1].Value = Int32.Parse(csvRows[z][y]);
+                                    else if (Regex.IsMatch(csvRows[z][y], "^(?:(?:31(\\/|-|\\.)(?:0?[13578]|1[02]))\\1|(?:(?:29|30)(\\/|-|\\.)(?:0?[13-9]|1[0-2])\\2))(?:(?:1[6-9]|[2-9]\\d)?\\d{2})$|^(?:29(\\/|-|\\.)0?2\\3(?:(?:(?:1[6-9]|[2-9]\\d)?(?:0[48]|[2468][048]|[13579][26])|(?:(?:16|[2468][048]|[3579][26])00))))$|^(?:0?[1-9]|1\\d|2[0-8])(\\/|-|\\.)(?:(?:0?[1-9])|(?:1[0-2]))\\4(?:(?:1[6-9]|[2-9]\\d)?\\d{2})$"))                                            //date
                                     {
-                                        DateTime dt = DateTime.Parse(csvRows[i][y], CultureInfo.InvariantCulture);
-                                        worksheet.Cells[i + 1, y + 1].Style.Numberformat.Format = "dd.mm.yyyy";
-                                        worksheet.Cells[i + 1, y + 1].Formula = $"=DATE({dt.Year},{dt.Month},{dt.Day})";
+                                        DateTime dt = DateTime.Parse(csvRows[z][y], CultureInfo.InvariantCulture);
+                                        worksheet.Cells[z + 1, y + 1].Style.Numberformat.Format = "dd.mm.yyyy";
+                                        worksheet.Cells[z + 1, y + 1].Formula = $"=DATE({dt.Year},{dt.Month},{dt.Day})";
                                     }
-                                    else if (Regex.IsMatch(csvRows[i][y], "^(?:(?:([01]?\\d|2[0-3]):)?([0-5]?\\d):)?([0-5]?\\d)$"))     //time
+                                    else if (Regex.IsMatch(csvRows[z][y], "^(?:(?:([01]?\\d|2[0-3]):)?([0-5]?\\d):)?([0-5]?\\d)$"))     //time
                                     {
-                                        DateTime dt = DateTime.ParseExact(csvRows[i][y], "HH:mm:ss", CultureInfo.InvariantCulture);
-                                        worksheet.Cells[i + 1, y + 1].Style.Numberformat.Format = "hh:mm:ss";
-                                        worksheet.Cells[i + 1, y + 1].Formula = $"=TIME({dt.Hour},{dt.Minute},{dt.Second})";
+                                        DateTime dt = DateTime.ParseExact(csvRows[z][y], "HH:mm:ss", CultureInfo.InvariantCulture);
+                                        worksheet.Cells[z + 1, y + 1].Style.Numberformat.Format = "hh:mm:ss";
+                                        worksheet.Cells[z + 1, y + 1].Formula = $"=TIME({dt.Hour},{dt.Minute},{dt.Second})";
                                     }
                                 }
                             }
                         }
-
-                        ExcelChart chart1 = worksheet.Drawings.AddChart("Engine parameters", eChartType.XYScatterLinesNoMarkers);
-                        chart1.Title.Text = chartTitle;
-                        chart1.SetPosition(1, 0, yAxisFieldColumn + dataFieldsAmount + 1, 0);
-                        chart1.SetSize(1500, 1000);
-                        ExcelChartSerie serie1 = chart1.Series.Add(worksheet.Cells[dataRowsOffset + 1, yAxisFieldColumn + 1 + dataFieldsOffset, csvRows.Count, yAxisFieldColumn + dataFieldsOffset + 1], worksheet.Cells[dataRowsOffset + 1, yAxisFieldColumn, csvRows.Count, yAxisFieldColumn]);
-                        serie1.Header = worksheet.Cells[dataRowsOffset, yAxisFieldColumn + dataFieldsOffset + 1].Value.ToString();
-                        for (int i = yAxisFieldColumn + dataFieldsOffset + 2; i <= yAxisFieldColumn + dataFieldsAmount; i++)
+                        if (c)
                         {
-                            ExcelChart chart2 = chart1.PlotArea.ChartTypes.Add(eChartType.XYScatterLinesNoMarkers);
-                            ExcelChartSerie serie2 = chart2.Series.Add(worksheet.Cells[dataRowsOffset + 1, i, csvRows.Count, i], worksheet.Cells[dataRowsOffset + 1, yAxisFieldColumn, csvRows.Count, yAxisFieldColumn]);
-                            serie2.Header = worksheet.Cells[dataRowsOffset, i].Value.ToString();
+                            ExcelChart chart1 = worksheet.Drawings.AddChart("Engine parameters", eChartType.XYScatterLinesNoMarkers);
+                            chart1.Title.Text = ct;
+                            chart1.SetPosition(1, 0, yAxisFieldColumn + fa + 1, 0);
+                            chart1.SetSize(cw, ch);
+                            chart1.XAxis.MaxValue = Convert.ToDouble(worksheet.Cells[csvRows.Count, yAxisFieldColumn].Value);
+                            ExcelChartSerie serie1 = chart1.Series.Add(worksheet.Cells[ro + 1, yAxisFieldColumn + 1 + fo, csvRows.Count, yAxisFieldColumn + fo + 1], worksheet.Cells[ro + 1, yAxisFieldColumn, csvRows.Count, yAxisFieldColumn]);
+                            serie1.Header = worksheet.Cells[ro, yAxisFieldColumn + fo + 1].Value.ToString();
+                            for (int y = yAxisFieldColumn + fo + 2; y <= yAxisFieldColumn + fa; y++)
+                            {
+                                ExcelChart chart2 = chart1.PlotArea.ChartTypes.Add(eChartType.XYScatterLinesNoMarkers);
+                                ExcelChartSerie serie2 = chart2.Series.Add(worksheet.Cells[ro + 1, y, csvRows.Count, y], worksheet.Cells[ro + 1, yAxisFieldColumn, csvRows.Count, yAxisFieldColumn]);
+                                serie2.Header = worksheet.Cells[ro, y].Value.ToString();
+                            }
                         }
+                        if (aw) worksheet.Cells[worksheet.Dimension.Address].AutoFitColumns();
+                        worksheet.View.FreezePanes(2, 1);
                         excelPackage.Save();
                         Console.WriteLine($"Success, {csvFilePath} saved as {xlsxFilePath}");
                     }
