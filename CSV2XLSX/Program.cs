@@ -164,7 +164,7 @@ namespace CSV2XLSX
                         }
                         if (!dc)
                         {
-                            ExcelChart chart = worksheet.Drawings.AddChart(ct, eChartType.Line);
+                            ExcelChart chart = worksheet.Drawings.AddChart(ct, eChartType.XYScatterLinesNoMarkers);
                             chart.Legend.Position = eLegendPosition.Bottom;
                             chart.Title.Text = ct;
                             chart.SetPosition(1, 0, yAxisFieldColumn + fa + 1, 0);
@@ -173,7 +173,7 @@ namespace CSV2XLSX
                             chart.XAxis.MinValue = Convert.ToDouble(worksheet.Cells[ro + 1, yAxisFieldColumn].Value);
                             for (int y = yAxisFieldColumn + fo + 2; y <= yAxisFieldColumn + fa; y++)
                             {
-                                ExcelChartSerie serie = chart.PlotArea.ChartTypes.Add(eChartType.Line).Series.Add(worksheet.Cells[ro + 1, y, csvRows.Count, y], worksheet.Cells[ro + 1, yAxisFieldColumn, csvRows.Count, yAxisFieldColumn]);
+                                ExcelChartSerie serie = chart.PlotArea.ChartTypes.Add(eChartType.XYScatterLinesNoMarkers).Series.Add(worksheet.Cells[ro + 1, y, csvRows.Count, y], worksheet.Cells[ro + 1, yAxisFieldColumn, csvRows.Count, yAxisFieldColumn]);
                                 serie.Header = worksheet.Cells[ro, y].Value.ToString();  
                             }
                         }
